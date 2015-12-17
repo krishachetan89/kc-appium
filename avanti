@@ -1,0 +1,335 @@
+#-*- coding: utf-8 -*-
+__author__ = 'chetan.krishna'
+import os
+import time
+import unittest
+from time import sleep
+from appium import webdriver
+
+# Returns absolute path relative to this file
+PATH = lambda p: os.path.abspath(
+    os.path.join(os.path.dirname(__file__), p)
+)
+
+
+class AvavntiAndroidTests(unittest.TestCase):
+    def setUp(self):
+        desired_caps = {}
+# Specify platform below(Android, iOS)
+        desired_caps['platformName'] = 'Android'
+# Specify OS version(Settings->About phone -> android version)
+        desired_caps['platformVersion'] = '4.4.4'
+# Obtain the Device name from Adb[For Android](Terminal Command: "adb devices")
+        desired_caps['deviceName'] = '4d0081004c8741a9'
+        desired_caps['noReset'] = False
+# Specify the path to Application
+        desired_caps["app"] = PATH('AvantiMarket_v1.0.2(Stage).apk')
+# Wait for email login activity to appear
+        desired_caps["appWaitActivity"]= ('com.byndl.avantimarket.ui.activity.EmailLoginActivity')
+        self.driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+
+    def tearDown(self):
+# end the session
+        self.driver.quit()
+
+
+    def test_Avanti_Login(self):
+        # wait for the login screen to appear
+        self.driver.implicitly_wait(20)
+        print("\n***********************************************************")
+        print("Test Case ID AAM-001(Verify the screen when the user launches the app for the first time after installation)")
+        if self.driver.find_element_by_id('com.byndl.avantimarket:id/m_emailTextField'):
+            print('Installation Status: Success, Sign-in screen is displayed at first launch')
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+        else:
+             print('Installation Status: Fail')
+             print('Test Result: Fail')
+             print("-----------------------------------------------------------")
+        print("\n***********************************************************")
+        print("Test Case ID AAM-008(Verify user is not able to Sign-in with empty email field. )")
+        self.driver.back()
+        self.driver.find_element_by_name('SIGN IN').click()
+        if self.driver.find_element_by_name('OK'):
+            self.driver.find_element_by_name('OK').click()
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+            self.driver.implicitly_wait(30)
+            time.sleep(5)
+
+        else:
+            print('Test Result: Fail')
+            print("-----------------------------------------------------------")
+            self.driver.implicitly_wait(30)
+            time.sleep(5)
+
+    def test_Avanti_Wrong_login(self):
+        print("Test Case ID AAM-003(Verify user is able to enter his/her email id in Email field )")
+        self.driver.implicitly_wait(20)
+        try:
+            self.driver.find_element_by_id('com.byndl.avantimarket:id/m_emailTextField').send_keys('indiaone@avantilab.org')
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+        except:
+             print('Test Result: Fail')
+             print("-----------------------------------------------------------")
+# sending password
+        print("\n***********************************************************")
+        print("Test Case ID AAM-009(Verify user is not able to Sign in with empty password field)")
+        self.driver.back()
+        self.driver.find_element_by_name('SIGN IN').click()
+        if self.driver.find_element_by_name('OK'):
+                self.driver.find_element_by_name('OK').click()
+                print('Test Result: Pass')
+                print("-----------------------------------------------------------")
+                self.driver.implicitly_wait(30)
+                time.sleep(5)
+        else:
+                print('Test Result: Fail')
+                print("-----------------------------------------------------------")
+                self.driver.implicitly_wait(30)
+                time.sleep(5)
+        print("Test Case ID AAM-0004(Verify user is able to enter his/her Password in Password field)")
+        if self.driver.find_element_by_id('com.byndl.avantimarket:id/m_passwordTextField').send_keys('87654321'):
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+        else:
+             print('Test Result: Fail')
+             print("-----------------------------------------------------------")
+        self.driver.back()
+        self.driver.implicitly_wait(10)
+        try:
+            print("Test Case ID AAM-0010(Verify User is able to login by entering registered email id and respective password)")
+            self.driver.find_element_by_name('SIGN IN').click()
+            try:
+                self.driver.find_element_by_name('OK')
+                print('Test Result: Fail')
+                print('Sign-In Failed')
+                print("-----------------------------------------------------------")
+                self.driver.implicitly_wait(30)
+                self.driver.quit()
+                time.sleep(5)
+            except:
+                print("Test Case ID AAM-0011(Terms of Service should be visible after first time successful Sign In)")
+            finally:
+                try:
+                    self.driver.find_element_by_name('Accept')
+                    print('Test Result: Pass')
+                    print("-----------------------------------------------------------")
+                    self.driver.implicitly_wait(30)
+                    time.sleep(5)
+                except Exception, e:
+                    print str(e)
+                    print('Test Result: Fail')
+                    print("-----------------------------------------------------------")
+        finally:
+
+            print("\n***********************************************************")
+        print("Test Case ID AAM-0018(Verify Accept button functionality in TOS pop up.)")
+        try:
+            self.driver.find_element_by_name('Accept').click()
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+            sleep(5)
+        except:
+            print('Test Result: Fail')
+            print("-----------------------------------------------------------")
+
+# Creating pin required for login
+        '''
+        print('TC-003-Creating Pin for user')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_phoneLabel').send_keys('1234567890')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_pinDigitOneTextField').send_keys('1')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_pinDigitTwoTextField').send_keys('1')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_pinDigitThreeTextField').send_keys('1')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_pinDigitFourTextField').send_keys('1')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_re_pinDigitOneTextField').send_keys('1')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_re_pinDigitTwoTextField').send_keys('1')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_re_pinDigitThreeTextField').send_keys('1')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_re_pinDigitFourTextField').send_keys('1')
+        self.driver.implicitly_wait(20)
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_saveButton').click()
+        self.driver.implicitly_wait(10)
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/btn_cominsoon_Yes').click()
+        self.driver.implicitly_wait(10)
+        time.sleep(8)
+        '''
+        print("\n***********************************************************")
+        print("Test Case ID AA-Pay-001-012(Verify Pay page contains following items, 1. Pay, 2. Auto reload, 3. Reload")
+        print('Attempting to navigate to pay screen')
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_balanceButton').click()
+        self.driver.implicitly_wait(10)
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_payButton').click()
+        self.driver.implicitly_wait(10)
+        try:
+            self.driver.implicitly_wait(10)
+            self.driver.find_element_by_id('com.byndl.avantimarket:id/cardContainer')
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+        except:
+               print('Test Result: Fail')
+               print("-----------------------------------------------------------")
+        else:
+            self.driver.back()
+            time.sleep(5)
+        try:
+            print("\n***********************************************************")
+            print("Test Case ID AA-pay-013-017-(Auto reload)")
+            self.driver.implicitly_wait(10)
+            self.driver.find_element_by_id("com.byndl.avantimarket:id/m_autoReloadButton").click()
+            self.driver.implicitly_wait(20)
+            time.sleep(3)
+            self.driver.find_element_by_id("com.byndl.avantimarket:id/btnYes").click()
+            self.driver.implicitly_wait(10)
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+        except:
+            print('Test Result: Fail')
+            print("-----------------------------------------------------------")
+
+
+    # Trying to reload
+        try:
+            print("\n***********************************************************")
+            print("Test Case ID AA-Reload-001-010(Verify user can reload)")
+            self.driver.find_element_by_id('com.byndl.avantimarket:id/m_reloadButton').click()
+            self.driver.implicitly_wait(10)
+        except:
+                print('Reload Failed,Cannot reload')
+                print('Test Result: Fail')
+                print("-----------------------------------------------------------")
+
+
+        else:
+
+            print('Attempting to reload with 10$')
+            self.driver.find_element_by_id('com.byndl.avantimarket:id/m_tenCheckbox').click()
+            self.driver.implicitly_wait(10)
+        print('Selecting first card from available cards')
+        try:
+            self.driver.find_element_by_id('com.byndl.avantimarket:id/m_firstCardNumber').click()
+            self.driver.implicitly_wait(10)
+        except:
+            print('No card present')
+            print('Test Result: Fail')
+            print("-----------------------------------------------------------")
+
+        finally:
+
+            self.driver.find_element_by_id('com.byndl.avantimarket:id/m_confirmButton').click()
+            self.driver.implicitly_wait(10)
+        try:
+            self.driver.find_element_by_name('OK').click()
+            self.driver.implicitly_wait(10)
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+
+        except:
+               print('Test Result: Fail')
+               print("-----------------------------------------------------------")
+
+        finally:
+            self.driver.back()
+            print("\n***********************************************************")
+            print("Test Case ID AA-Ways to pay-001-002(Verify user can navigate to ways to pay and can swipe through cards)")
+            self.driver.implicitly_wait(10)
+        try:
+            self.driver.find_element_by_id('com.byndl.avantimarket:id/m_cardsButton').click()
+            time.sleep(5)
+            self.driver.implicitly_wait(10)
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+        except:
+             print('Test Result: Fail')
+             print("-----------------------------------------------------------")
+
+
+        finally:
+                print("\n***********************************************************")
+
+                print('Swiping between cards')
+        try:
+                self.driver.implicitly_wait(30)
+                for x in range(0, 2):
+                    time.sleep(5)
+                    self.driver.swipe(start_x=655,start_y=510,end_x=150,end_y=510)
+                    self.driver.implicitly_wait(20)
+                    time.sleep(2)
+                    self.driver.swipe(start_x=150,start_y=510,end_x=655,end_y=150)
+                    print('Test Result: Pass')
+                    print("-----------------------------------------------------------")
+        except:
+                print('Test Result: Fail')
+                print("-----------------------------------------------------------")
+
+        finally:
+
+                self.driver.back()
+                self.driver.implicitly_wait(30)
+        print("\n***********************************************************")
+        print('Test Case ID AA-history001-002')
+        try:
+            self.driver.implicitly_wait(30)
+            self.driver.find_element_by_id("com.byndl.avantimarket:id/m_historyButton").click()
+            time.sleep(5)
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+        except:
+              print('Test Result: Fail')
+              print("-----------------------------------------------------------")
+        finally:
+                self.driver.back()
+
+        print("\n***********************************************************")
+        print("Test Case ID AA-My account T&C")
+        self.driver.implicitly_wait(10)
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_menuButton').click()
+        self.driver.implicitly_wait(10)
+        self.driver.find_element_by_name("MY ACCOUNT").click()
+        try:
+            self.driver.implicitly_wait(20)
+            self.driver.find_element_by_id("com.byndl.avantimarket:id/terms").click()
+            self.driver.implicitly_wait(10)
+            self.driver.find_element_by_id("com.byndl.avantimarket:id/cancel_button").click()
+            self.driver.implicitly_wait(10)
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+        except:
+            print('Test Result: Fail')
+            print("-----------------------------------------------------------")
+        finally:
+            self.driver.back()
+        self.driver.implicitly_wait(30)
+        print("\n***********************************************************")
+        print('Test Case ID AA-About us-001')
+        self.driver.implicitly_wait(30)
+        self.driver.find_element_by_id('com.byndl.avantimarket:id/m_menuButton').click()
+        try:
+                self.driver.find_element_by_id('com.byndl.avantimarket:id/m_about_us').click()
+                self.driver.implicitly_wait(10)
+                print('Test Result: Pass')
+                print("-----------------------------------------------------------")
+        except:
+                print('Test Result: Fail')
+                print("-----------------------------------------------------------")
+        finally:
+            print("\n***********************************************************")
+            print('Test Case ID AA-Signout-001')
+        try:
+            self.driver.implicitly_wait(20)
+            self.driver.find_element_by_id('com.byndl.avantimarket:id/m_menuButton').click()
+            self.driver.implicitly_wait(20)
+            self.driver.find_element_by_id("com.byndl.avantimarket:id/m_sign_out").click()
+            print('Test Result: Pass')
+            print("-----------------------------------------------------------")
+        except:
+            print('Test Result: Fail')
+            print("-----------------------------------------------------------")
+
+        print ('Test Finished')
+        print("\n***********************************************************")
+if __name__ == '__main__':
+    suite = unittest.TestLoader().loadTestsFromTestCase(AvavntiAndroidTests)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+
+
